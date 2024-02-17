@@ -1,44 +1,23 @@
-pipeline {
-    agent any
-    
-    environment {
-        SONAR_TOKEN = credentials('sqa_cadff09ca7ac9aec797f13ec1101bf66d3fbc762')
+node {
+    stage('Git'){
+      git 'https://github.com/mkk1712/java-maven-app'      
     }
     
-    stages {
-        stage('Checkout') {
-            steps {
-                // Checkout code from Git repository
-                git 'https://github.com/mkk1712/java-maven-app'
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                // Build your project (e.g., Maven, Gradle, etc.)
-                sh 'mvn clean package'
-            }
-        }
-        
-        stage('SonarQube Analysis') {
-            steps {
-                // Run SonarQube analysis
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
+    stage('Maven Build'){
+      sh 'mvn clean package'   
+    }
+    stage('Archive Artifacts'){
+         archiveArtifacts 'target/myweb.war'
     }
     
-    post {
-        success {
-            // If build is successful, trigger downstream jobs or perform other actions
-            echo 'Build successful!'
-        }
-        
-        failure {
-            // If build fails, perform cleanup or notify stakeholders
-            echo 'Build failed!'
-        }
+    stage('Email'){
+    
+    mail bcc: '', body: '''Thanks,
+Java Home''', cc: '', from: '', replyTo: '', subject: 'Pipeline Demo', to: 'maheshreddy0421@gmail.com'
+
+
+
+
+
     }
 }
